@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Outloud.Common.Authentication;
 using Outloud.Common.Swagger;
 
 namespace Outloud.ScoreService
@@ -20,6 +21,7 @@ namespace Outloud.ScoreService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAuth0();
             services.AddSwagger();
         }
 
@@ -36,6 +38,7 @@ namespace Outloud.ScoreService
                 app.UseHsts();
             }
 
+            app.UseAuth0();
             app.UseSwagger();
             app.UseHttpsRedirection();
             app.UseMvc();
