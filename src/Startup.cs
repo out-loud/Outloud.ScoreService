@@ -53,7 +53,6 @@ namespace Outloud.ScoreService
 
             app.UseAuth0();
             app.UseSwagger();
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
