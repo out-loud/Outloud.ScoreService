@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Outloud.Common.Authentication;
 using Outloud.Common.Swagger;
+using Outloud.ScoreService.Persistance;
+using Outloud.ScoreService.Persistance.Repositories;
 
 namespace Outloud.ScoreService
 {
@@ -16,16 +19,21 @@ namespace Outloud.ScoreService
         }
 
         public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserDataRepository, UserDataRepository>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAuth0();
             services.AddSwagger();
-        }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            services.AddDbContext<UserDataDbContext>(
+                options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                opt => opt.UseRowNumberForPaging()), ServiceLifetime.Singleton);
+        }
+        
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -34,7 +42,6 @@ namespace Outloud.ScoreService
             }
             else
             {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
